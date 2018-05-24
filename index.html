@@ -1,0 +1,157 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>SuperPong</title>
+
+    <style>
+        canvas {
+            background: #eee;
+            display: block;
+            margin: 0 auto;
+        }
+    </style>
+
+</head>
+<body>
+<canvas id="myCanvas" width="480" height="320"></canvas>
+
+
+<script>
+    let canvas = document.getElementById("myCanvas");
+    let ctx = canvas.getContext("2d");
+    var dx=2;
+    var dy=-2;
+    var derechaPresionada = false;
+    var izquierdaPresionada = false;
+    document.addEventListener("keydown", keyDownHandler, false);
+    document.addEventListener("keyup", keyUpHandler, false);
+
+    function keyDownHandler(e) { //preguntamos si la tecla esta presionada
+        if(e.keyCode == 39){
+            derechaPresionada = true;
+        }
+        else if (e.keyCode == 37){ //las teclas tienen una numeracion, se puede buscar en internet
+            izquierdaPresionada = true;
+        }
+                console.log(e.keyCode)
+
+    }
+    function keyUpHandler(e){
+        if(e.keyCode == 39){
+            derechaPresionada = false;
+        }
+        else if (e.keyCode == 37){ //las teclas tienen una numeracion, se puede buscar en internet
+            izquierdaPresionada = false;
+        }
+        console.log(e.keyCode)
+
+
+    }
+    // Barra
+    let barra = {
+        ancho: 80,
+        alto: 15,
+        x: canvas.width / 2 - 80 / 2,
+        y: canvas.height - 30,
+        color: '#0ad',
+        dibujar: function () {
+
+            ctx.beginPath();
+            ctx.rect(this.x, this.y, this.ancho, this.alto);
+            ctx.fillStyle = this.color;
+            ctx.fill();
+            ctx.closePath();
+        }
+    };
+
+    // Bolita
+    let bolita = {
+        radio: 15,
+        x: canvas.width / 2 - 80 / 2,
+        y: canvas.height - 50,
+        color: '#d0a',
+        dibujar: function () {
+            ctx.beginPath();
+            ctx.arc(this.x, this.y, this.radio, 0, Math.PI * 2);
+            ctx.fillStyle = this.color;
+            ctx.fill();
+            ctx.closePath();
+        }
+    };
+
+
+    // Bloques
+    let bloques = {
+        contenido: [],
+        columnas: 5,
+        filas: 3,
+        margenTop: 30,
+        margenIzq: 30,
+        init: function () {
+            for (var f = 0; f < this.filas; f++) {
+                for (var c = 0; c < this.columnas; c++) {
+                    this.contenido.push(
+                            {
+                                x: this.margenIzq + c * 75,
+                                y: this.margenTop + f * 20,
+                                existe: true
+                            }
+                    )
+
+                }
+            }
+        },
+        dibujar: function () {
+
+            for (bloque of this.contenido){
+                if(bloque.existe) {
+                    ctx.beginPath();
+                    ctx.rect(bloque.x, bloque.y, 70, 18);
+                    ctx.fillStyle = '#259';
+                    ctx.fill();
+                    ctx.closePath();
+                }
+            }
+        }
+    };
+
+console.log(derechaPresionada);
+    console.log(izquierdaPresionada);
+
+    bolita.dibujar();
+
+    barra.dibujar();
+    bloques.init();
+    bloques.dibujar();
+
+    function dibujarJuego(){
+        ctx.clearRect(0,0, canvas.width, canvas.height); //limpio el canvas
+    if(bolita.y+bolita.radio <0){
+        dy= -dy;
+    }
+        if(bolita.y+bolita.radio> canvas.height){
+            dy =-dy; //hago que la bolita no se me hunda en la pared superior del canvas, por el tamaño del radio
+        }
+        if(bolita.x+bolita.radio > canvas.width){
+            dx= -dx;
+        }
+        if(bolita.x-bolita.radio < 0){
+            dx =-dx;
+        }
+        if (derechaPresionada && barra.x + barra.ancho < canvas.width){//vamos preguntando cual tecla esta presionada,
+            barra.x += dx;                                                  //ytambien decimos que la barra no se salga de limites
+        }                                                               //del canvas, del lado derecho y del izq, sup e inf
+        if (izquierdaPresionada && barra.x > 0){
+            barra.y -= dx;
+        }
+        if(bolita.y )
+        bolita.dibujar();
+        barra.dibujar();
+        bolita.x += dx;
+        bolita.y += dy;
+    }
+    setInterval(dibujarJuego, 15);
+</script>
+</body>
+</html>
