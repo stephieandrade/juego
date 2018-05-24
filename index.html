@@ -71,6 +71,9 @@
         x: canvas.width / 2 - 80 / 2,
         y: canvas.height - 50,
         color: '#d0a',
+        velX: 3,
+        velY: -3,
+
         dibujar: function () {
             ctx.beginPath();
             ctx.arc(this.x, this.y, this.radio, 0, Math.PI * 2);
@@ -107,6 +110,7 @@
             for (bloque of this.contenido){
                 if(bloque.existe) {
                     ctx.beginPath();
+
                     ctx.rect(bloque.x, bloque.y, 70, 18);
                     ctx.fillStyle = '#259';
                     ctx.fill();
@@ -119,6 +123,19 @@
 console.log(derechaPresionada);
     console.log(izquierdaPresionada);
 
+    function detectorColision() {
+        for(b of bloques.contenido){
+            if (b.existe){
+                if(bolita.x + bolita.radio> b.x && bolita.x < b.x+bloques.ancho &&
+                bolita.y + bolita.radio> b.y && bolita.y > b.y+bloques.alto){
+                    bolita.velY = -bolita.velY;
+                    b.existe = false;
+                }
+            }
+        }
+
+    }
+
     bolita.dibujar();
 
     barra.dibujar();
@@ -127,22 +144,27 @@ console.log(derechaPresionada);
 
     function dibujarJuego(){
         ctx.clearRect(0,0, canvas.width, canvas.height); //limpio el canvas
-    if(bolita.y+bolita.radio <0){
+    if(bolita.y-bolita.radio <0){   //rebota arriba
         dy= -dy;
     }
-        if(bolita.y+bolita.radio> canvas.height){
-            dy =-dy; //hago que la bolita no se me hunda en la pared superior del canvas, por el tamaño del radio
+        if(bolita.y+bolita.radio> canvas.height){//hago que la bolita no se me hunda en la pared superior del canvas, por el tamaño del radio
+            dy =-dy;
+            if (bolita.x > barra.x && bolita.x < barra.ancho + barra.x){ //si bolita pasa limite inf entonces game over
+            dy = -dy;}
+
+            else {alert("Game Over");}
         }
-        if(bolita.x+bolita.radio > canvas.width){
+        if(bolita.x+bolita.radio > canvas.width){ //rebota der
             dx= -dx;
         }
-        if(bolita.x-bolita.radio < 0){
+        if(bolita.x-bolita.radio < 0){ //rebota iz
             dx =-dx;
         }
         if (derechaPresionada && barra.x + barra.ancho < canvas.width){//vamos preguntando cual tecla esta presionada,
             barra.x += dx;                                                  //ytambien decimos que la barra no se salga de limites
         }                                                               //del canvas, del lado derecho y del izq, sup e inf
-        if (izquierdaPresionada && barra.x > 0){
+                                                                                    //mueve der
+        if (izquierdaPresionada && barra.x > 0){  //mueve izq
             barra.y -= dx;
         }
         if(bolita.y )
@@ -150,6 +172,7 @@ console.log(derechaPresionada);
         barra.dibujar();
         bolita.x += dx;
         bolita.y += dy;
+        bloques.dibujar();
     }
     setInterval(dibujarJuego, 15);
 </script>
